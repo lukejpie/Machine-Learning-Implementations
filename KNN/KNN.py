@@ -53,14 +53,7 @@ class knn:
         #SHOULD USE PANDAS to perform "lapply" type of function for using distance function over all of the rows
         distances = self.x_training.apply(self.__distance,axis=1,args=(test,distance_function,p_value))
 
-        # print(self.x_training)
-        # print()
-        # print(distances)
-
         distances_sorted = distances.sort_values(0)
-
-        # print(distances_sorted)
-        # print(distances_sorted[:k].index)
 
         k_nearest_neighbors = distances_sorted[:k]
 
@@ -75,11 +68,11 @@ class knn:
     # Output:
     #   prediction based on labels of nearest_neighbors
     def __predict(self,nearest_neighbors):
-        print(nearest_neighbors)
-        print(type(nearest_neighbors))
-        # nearest_neighbors_labels = self.y_training[nearest_neighbors]
-        # print(nearest_neighbors_labels)
-        return
+
+        nearest_neighbors_labels = self.y_training.iloc[nearest_neighbors,:]
+        counts = nearest_neighbors_labels[0].value_counts()
+
+        return counts.keys()[0]
 
     # __classify - Private function that classifies given test vector based on k-nearest neighbors from training set
     # Params:
@@ -93,6 +86,8 @@ class knn:
         nearest_neighbors = self.__nearest_neighbors(one_test,k,distance_function,p_value)
 
         prediction = self.__predict(nearest_neighbors)
+
+        return prediction
 
     # classify - Function that classifies all given test vectors based on k-nearest neighbors from training set
     # Params:
@@ -110,3 +105,8 @@ class knn:
         print(all_test_df)
 
         all_classifications = all_test_df.apply(self.__classify,axis=1,args=(distance_function,k,p_value))
+
+        print("all_class")
+        print(all_classifications)
+
+        return all_classifications
