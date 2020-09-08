@@ -8,7 +8,7 @@ class knn:
     # Initialization of KNN Classifier Object
     def __init__(self,x_training,y_training,k=3):
         self.x_training = pd.DataFrame(x_training)
-        self.y_training = y_training
+        self.y_training = pd.DataFrame(y_training)
         self.k = k
 
     # distance - Private function calculates the distance between given vectors v1 and v2
@@ -53,28 +53,60 @@ class knn:
         #SHOULD USE PANDAS to perform "lapply" type of function for using distance function over all of the rows
         distances = self.x_training.apply(self.__distance,axis=1,args=(test,distance_function,p_value))
 
-        print(self.x_training)
-        print()
-        print(distances)
+        # print(self.x_training)
+        # print()
+        # print(distances)
+
         distances_sorted = distances.sort_values(0)
-        print(distances_sorted)
-        print(distances_sorted[:k].index)
-        return
 
-    def __predict(self,nearest_neighbors):
-        return
+        # print(distances_sorted)
+        # print(distances_sorted[:k].index)
 
-    # classify - Classifies given test point based on k-nearest neighbors from training set
+        k_nearest_neighbors = distances_sorted[:k]
+
+        k_nearest_neighbors_indices = k_nearest_neighbors.index
+
+        # print(k_nearest_neighbors)
+        return k_nearest_neighbors_indices
+
+    # __predict - Private function that predicts the classification of given test vector from nearest neighbors
     # Params:
-    #   test - given vector to classify
+    #   nearest_neighbors - pandas dataframe of the indices of the nearest neighbors
+    # Output:
+    #   prediction based on labels of nearest_neighbors
+    def __predict(self,nearest_neighbors):
+        print(nearest_neighbors)
+        print(type(nearest_neighbors))
+        # nearest_neighbors_labels = self.y_training[nearest_neighbors]
+        # print(nearest_neighbors_labels)
+        return
+
+    # __classify - Private function that classifies given test vector based on k-nearest neighbors from training set
+    # Params:
+    #   one_test - given vector to classify
     #   k - number of nearest neighbors to evaluate for classifcation (Defaults to initialized self.k value)
     #   distance_function - Selector for distance function to utilize (1 = Euclidean, 2 = Manhattan, 3 = Minkowski)
     # Output:
     #   classifcation of test vector
-    def classify(self,test,distance_function,k = None,p_value=3):
+    def __classify(self,one_test,distance_function,k,p_value=3):
+
+        nearest_neighbors = self.__nearest_neighbors(one_test,k,distance_function,p_value)
+
+        prediction = self.__predict(nearest_neighbors)
+
+    # classify - Function that classifies all given test vectors based on k-nearest neighbors from training set
+    # Params:
+    #   all_test - numpy array of vectors to classify
+    #   k - number of nearest neighbors to evaluate for classifcation (Defaults to initialized self.k value)
+    #   distance_function - Selector for distance function to utilize (1 = Euclidean, 2 = Manhattan, 3 = Minkowski)
+    # Output:
+    #   classifcation of all test vectors
+    def classify(self,all_test,distance_function,k = None,p_value=3):
         if k is None:
             k = self.k
 
-        nearest_neighbors = self.__nearest_neighbors(test,k,distance_function,p_value)
+        all_test_df = pd.DataFrame(all_test)
 
-        # prediction = __predict(nearest_neighbors)
+        print(all_test_df)
+
+        all_classifications = all_test_df.apply(self.__classify,axis=1,args=(distance_function,k,p_value))
